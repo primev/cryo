@@ -19,7 +19,7 @@ pub struct Blocks {
     gas_limit: Vec<u64>,
     extra_data: Vec<Vec<u8>>,
     logs_bloom: Vec<Option<Vec<u8>>>,
-    timestamp: Vec<u32>,
+    timestamp: Vec<u64>,
     difficulty: Vec<u64>,
     total_difficulty: Vec<Option<U256>>,
     size: Vec<Option<u32>>,
@@ -102,7 +102,7 @@ pub(crate) fn process_block<TX>(block: Block<TX>, columns: &mut Blocks, schema: 
     store!(schema, columns, gas_limit, block.gas_limit.as_u64());
     store!(schema, columns, extra_data, block.extra_data.to_vec());
     store!(schema, columns, logs_bloom, block.logs_bloom.map(|x| x.0.to_vec()));
-    store!(schema, columns, timestamp, block.timestamp.as_u32());
+    store!(schema, columns, timestamp, block.timestamp.as_u64());
     store!(schema, columns, difficulty, block.difficulty.as_u64());
     store!(schema, columns, total_difficulty, block.total_difficulty);
     store!(schema, columns, base_fee_per_gas, block.base_fee_per_gas.map(|x| x.as_u64()));

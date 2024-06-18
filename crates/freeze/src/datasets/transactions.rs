@@ -28,7 +28,7 @@ pub struct Transactions {
     n_rlp_bytes: Vec<u32>,
     block_hash: Vec<Vec<u8>>,
     chain_id: Vec<u64>,
-    timestamp: Vec<u32>,
+    timestamp: Vec<u64>,
     r: Vec<Vec<u8>>,
     s: Vec<Vec<u8>>,
     v: Vec<u64>,
@@ -131,7 +131,7 @@ impl CollectByBlock for Transactions {
                 columns,
                 schema,
                 exclude_failed,
-                block.timestamp.as_u32(),
+                block.timestamp.as_u64(),
             )?;
         }
         Ok(())
@@ -140,7 +140,7 @@ impl CollectByBlock for Transactions {
 
 #[async_trait::async_trait]
 impl CollectByTransaction for Transactions {
-    type Response = (TransactionAndReceipt, bool, u32);
+    type Response = (TransactionAndReceipt, bool, u64);
 
     async fn extract(request: Params, source: Arc<Source>, query: Arc<Query>) -> R<Self::Response> {
         let tx_hash = request.ethers_transaction_hash()?;
@@ -164,7 +164,7 @@ impl CollectByTransaction for Transactions {
             .await?
             .ok_or(CollectError::CollectError("block not found".to_string()))?;
 
-        let timestamp = block.timestamp.as_u32();
+        let timestamp = block.timestamp.as_u64();
 
         Ok(((transaction, receipt), query.exclude_failed, timestamp))
     }
@@ -183,7 +183,7 @@ pub(crate) fn process_transaction(
     columns: &mut Transactions,
     schema: &Table,
     exclude_failed: bool,
-    timestamp: u32,
+    timestamp: u64,
 ) -> R<()> {
     let success = if exclude_failed | schema.has_column("success") {
         let success = tx_success(&tx, &receipt)?;
